@@ -17,10 +17,8 @@ def preprocess(mysql_url, csv_url='https://s3.amazonaws.com/opendoor-problems/li
     cursor = db.cursor()
 
     print "Rebuilding table structure..."
-    cursor.execute("DROP TABLE IF EXISTS listings")
-
     cursor.execute("""
-        CREATE TABLE `listings` (
+        CREATE TABLE IF NOT EXISTS `listings` (
             `id` INT NOT NULL,
             `street` TEXT NULL,
             `status` VARCHAR(64) NULL,
@@ -30,7 +28,8 @@ def preprocess(mysql_url, csv_url='https://s3.amazonaws.com/opendoor-problems/li
             `sq_ft` INT NULL,
             `lat` DOUBLE NULL,
             `lng` DOUBLE NULL,
-            PRIMARY KEY (`id`) );
+            PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
         """)
 
     print "Loading CSV data..."
@@ -53,7 +52,11 @@ def preprocess(mysql_url, csv_url='https://s3.amazonaws.com/opendoor-problems/li
                 float(row['lng']),
             ))
 
-    cursor.execute("INSERT INTO listings (id, street, status, price, bedrooms, bathrooms, sq_ft, lat, lng) VALUES " + ", ".join(csv_data))
+    cursor.execute(
+        "INSERT INTO listings (id, street, status, price, bedrooms, bathrooms, sq_ft, lat, lng) VALUES " +
+        ", ".join(csv_data) +
+        " ON DUPLICATE KEY UPDATE street=street, status=status, price=price, bedrooms=bedrooms, bathrooms=bathrooms, sq_ft=sq_ft, lat=lat, lng=lng"
+    )
 
     db.commit()
 
