@@ -1,5 +1,15 @@
+from preprocess import preprocess
 from flask import Flask
-app = Flask(__name__)
+import os
+
+
+def create_app():
+    preprocess(mysql_url=os.environ['CLEARDB_DATABASE_URL'])
+    app = Flask(__name__)
+
+    return app
+
+app = create_app()
 
 
 @app.route('/')
