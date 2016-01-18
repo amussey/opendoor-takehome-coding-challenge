@@ -1,8 +1,9 @@
-from flask import Flask
+from flask import Flask, request
 import os
+import json
 
 from preprocess import preprocess
-from helpers import return_md_as_html
+from helpers import return_md_as_html, fetch_listings, property_to_json
 
 
 def create_app():
@@ -21,7 +22,18 @@ def index():
 
 @app.route('/listings')
 def listings():
-    return '{}'
+    listings = fetch_listings(mysql_url=os.environ['CLEARDB_DATABASE_URL'], params=request.args)
+
+    results = {
+        "type": "FeatureCollection",
+        "features": [
+        ]
+    }
+
+    for listing in listings:
+        results["features"].append(property_to_json(listing))
+
+    return json.dumps(results)
 
 if __name__ == '__main__':
     app.run()
