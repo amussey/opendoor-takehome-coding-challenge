@@ -1,6 +1,8 @@
-from preprocess import preprocess
 from flask import Flask
 import os
+
+from preprocess import preprocess
+from helpers import return_md_as_html
 
 
 def create_app():
@@ -14,7 +16,7 @@ app = create_app()
 
 @app.route('/')
 def index():
-    return 'Welcome to the Opendoor listings API!'
+    return return_md_as_html(filename='PROBLEM.md', title='Opendoor Engineering Problem')
 
 
 @app.route('/listings')
