@@ -89,6 +89,7 @@ Bonus Points:
 Given more time, I would like to make the following improvements:
 
  * Tests (primarily unit and acceptance).
+ * Filtering based on the `status` of the listings.  Currently, all listings are being returned with no indicator of what state they are in (`active`, `pending`, or `sold`).
  * Currently, every query against `/listings` creates a new MySQL connection.  Ideally, one connection could be created when the app launches and be refreshed when a disconnect is detected.
  * Page sizes are currently static (locked to 15).  There should be a `count` parameter to make this configurable.
  * Better exception handling.  There area a couple places where exception handling could be improved, such as around the database connection and around the handling of the CSV data.
