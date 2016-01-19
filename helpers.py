@@ -35,7 +35,7 @@ def return_md_as_html(filename, title):
     return html
 
 
-def fetch_listings(mysql_url, params=[]):
+def connect_to_mysql(mysql_url):
     mysql_connection_string = urlparse(mysql_url)
 
     db = MySQLdb.connect(host=mysql_connection_string.hostname,
@@ -43,20 +43,59 @@ def fetch_listings(mysql_url, params=[]):
                          passwd=mysql_connection_string.password,
                          db=mysql_connection_string.path.strip('/'))
 
+    return db
+
+
+def calculate_pagination(current_page=1, num_of_listings=0):
+    listings_per_page = 15
+
+    total_pages = (num_of_listings / listings_per_page) + 1
+
+    if current_page < 1:
+        current_page = 1
+    if current_page > total_pages:
+        current_page = total_pages
+
+    # Calculate the set of listings
+    start = (current_page - 1) * listings_per_page
+    end = start + listings_per_page
+
+    return start, end
+
+
+def build_links_header(request, current_page=1, num_of_listings=0):
+    listings_per_page = 15
+
+    total_pages = (num_of_listings / listings_per_page) + 1
+
+    if current_page < 1:
+        current_page = 1
+    if current_page > total_pages:
+        current_page = total_pages
+
+    api_endpoint = request.host_url.strip('/') + request.path
+
+    query_string = '&'.join(['{}={}'.format(key, value) for key, value in request.args.items() if key != 'page'])
+    base_api_endpoint = '<' + api_endpoint + '?' + (query_string + '&page={}>; rel="{}"').strip('&')
+
+    links = [
+        base_api_endpoint.format(1, "first"),
+        base_api_endpoint.format(total_pages, "last"),
+    ]
+    if current_page > 1:
+        links.append(base_api_endpoint.format(current_page - 1, "prev"))
+    if current_page < total_pages:
+        links.append(base_api_endpoint.format(current_page + 1, "next"))
+
+    return ', '.join(links)
+
+
+def fetch_listings(db, request):
+    params = request.args
     cursor = db.cursor()
 
-    sql = """
-        SELECT
-            id,
-            price,
-            street,
-            bedrooms,
-            bathrooms,
-            sq_ft,
-            lat,
-            lng
-        FROM listings
-    """
+    sql_select_header = "SELECT id, price, street, bedrooms, bathrooms, sq_ft, lat, lng FROM listings"
+    sql_count_header = "SELECT count(*) AS count FROM listings"
 
     sql_where = []
 
@@ -74,45 +113,24 @@ def fetch_listings(mysql_url, params=[]):
         sql_where.append("bathrooms <= %i" % int(params['max_bath']))
 
     if len(sql_where) > 0:
-        sql = sql + " WHERE " + " AND ".join(sql_where)
+        sql_count_header = sql_count_header + " WHERE " + " AND ".join(sql_where)
 
-    print sql
-
-    cursor.execute(sql)
-    rows = cursor.fetchall()
-
-    db.close()
-
-    return rows
-
-
-def paginate_listings(listings=list(), params=list(), api_endpoint=''):
-    listings_per_page = 15
+    cursor.execute(sql_count_header)
+    num_of_listings = cursor.fetchall()[0][0]
 
     current_page = int(params.get('page', 1))
-    total_pages = (len(listings) / listings_per_page) + 1
 
-    if current_page > total_pages:
-        current_page = total_pages
+    start_page, end_page = calculate_pagination(current_page=current_page, num_of_listings=num_of_listings)
+    pagination_header = build_links_header(request=request, current_page=current_page, num_of_listings=num_of_listings)
 
-    query_string = '&'.join(['{}={}'.format(key, value) for key, value in params.items() if key != 'page'])
-    base_api_endpoint = '<' + api_endpoint + '?' + query_string + '&page={}>; rel="{}"'
+    if len(sql_where) > 0:
+        sql_select_header = sql_select_header + " WHERE " + " AND ".join(sql_where)
+    sql_select_header += " LIMIT {}, {}".format(start_page, end_page)
 
-    links = [
-        base_api_endpoint.format(1, "first"),
-        base_api_endpoint.format(total_pages, "last"),
-    ]
-    if current_page > 1:
-        links.append(base_api_endpoint.format(current_page - 1, "prev"))
-    if current_page < total_pages:
-        links.append(base_api_endpoint.format(current_page + 1, "next"))
+    cursor.execute(sql_select_header)
+    rows = cursor.fetchall()
 
-    # Calculate the set of listings
-    listing_start = (current_page - 1) * listings_per_page
-    listing_end = listing_start + listings_per_page
-    listings = listings[listing_start:listing_end]
-
-    return listings, ', '.join(links)
+    return rows, pagination_header
 
 
 def property_to_json(mysql_row):

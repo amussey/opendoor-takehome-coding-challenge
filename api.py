@@ -3,7 +3,7 @@ import os
 import json
 
 from preprocess import preprocess
-from helpers import return_md_as_html, fetch_listings, paginate_listings, property_to_json
+from helpers import return_md_as_html, fetch_listings, connect_to_mysql, property_to_json
 
 
 def create_app():
@@ -22,24 +22,17 @@ def index():
 
 @app.route('/listings')
 def listings():
-    listings = fetch_listings(mysql_url=os.environ['CLEARDB_DATABASE_URL'], params=request.args)
-    listings, link_header = paginate_listings(
-        listings=listings,
-        params=request.args,
-        api_endpoint=request.host_url.strip('/') + request.path
-    )
+    db = connect_to_mysql(mysql_url=os.environ['CLEARDB_DATABASE_URL'])
+    listings, pagination = fetch_listings(db=db, request=request)
+    db.close()
 
     results = {
         "type": "FeatureCollection",
-        "features": [
-        ]
+        "features": [property_to_json(listing) for listing in listings]
     }
 
-    for listing in listings:
-        results["features"].append(property_to_json(listing))
-
     response = Response(json.dumps(results))
-    response.headers['Links'] = link_header
+    response.headers['Links'] = pagination
     return response
 
 if __name__ == '__main__':
