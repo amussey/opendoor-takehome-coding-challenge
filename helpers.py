@@ -86,6 +86,35 @@ def fetch_listings(mysql_url, params=[]):
     return rows
 
 
+def paginate_listings(listings=list(), params=list(), api_endpoint=''):
+    listings_per_page = 15
+
+    current_page = int(params.get('page', 1))
+    total_pages = (len(listings) / listings_per_page) + 1
+
+    if current_page > total_pages:
+        current_page = total_pages
+
+    query_string = '&'.join(['{}={}'.format(key, value) for key, value in params.items() if key != 'page'])
+    base_api_endpoint = '<' + api_endpoint + '?' + query_string + '&page={}>; rel="{}"'
+
+    links = [
+        base_api_endpoint.format(1, "first"),
+        base_api_endpoint.format(total_pages, "last"),
+    ]
+    if current_page > 1:
+        links.append(base_api_endpoint.format(current_page - 1, "prev"))
+    if current_page < total_pages:
+        links.append(base_api_endpoint.format(current_page + 1, "next"))
+
+    # Calculate the set of listings
+    listing_start = (current_page - 1) * listings_per_page
+    listing_end = listing_start + listings_per_page
+    listings = listings[listing_start:listing_end]
+
+    return listings, ', '.join(links)
+
+
 def property_to_json(mysql_row):
     return {
         "type": "Feature",
