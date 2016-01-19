@@ -4,6 +4,16 @@ import MySQLdb
 
 
 def return_md_as_html(filename, title):
+    """Return a Markdown file as HTML.
+
+    Args:
+        filename (str): The Markdown file to convert to HTML.
+        title (str): The title of the new HTML page.
+
+    Returns:
+        str: An HTML blob.
+    """
+
     markdown = open(filename, 'r')
     markdown_html = mistune.markdown(markdown.read())
     markdown.close()
@@ -36,6 +46,17 @@ def return_md_as_html(filename, title):
 
 
 def connect_to_mysql(mysql_url):
+    """Connect to a MySQL database.
+
+    Args:
+        mysql_url (str): The MySQL Connections string.
+            This should come in the form of:
+                mysql://username:password@hostname.com/database
+
+    Returns:
+        MySQLdb.connections.Connection: An open MySQL connection.
+    """
+
     mysql_connection_string = urlparse(mysql_url)
 
     db = MySQLdb.connect(host=mysql_connection_string.hostname,
