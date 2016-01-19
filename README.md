@@ -13,7 +13,7 @@ The available endpoints are:
 | `/`         | `GET`             | Returns the contents `PROBLEM.md`.      | 
 | `/listings` | `GET`             | Fetch a JSON list of house listings.    |
 
-The `/listings` endpoin supports the following query paramters:
+The `/listings` endpoint supports the following query parameters:
 
 | Parameter    | Description                                       |
 |--------------|---------------------------------------------------|
