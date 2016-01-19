@@ -1,19 +1,8 @@
 import csv
 import urllib2
-from urlparse import urlparse
-import MySQLdb
 
 
-def preprocess(mysql_url, csv_url='https://s3.amazonaws.com/opendoor-problems/listings.csv'):
-
-    print "Connecting to database..."
-    mysql_connection_string = urlparse(mysql_url)
-
-    db = MySQLdb.connect(host=mysql_connection_string.hostname,
-                         user=mysql_connection_string.username,
-                         passwd=mysql_connection_string.password,
-                         db=mysql_connection_string.path.strip('/'))
-
+def preprocess(db, csv_url='https://s3.amazonaws.com/opendoor-problems/listings.csv'):
     cursor = db.cursor()
 
     print "Rebuilding table structure..."
@@ -61,4 +50,3 @@ def preprocess(mysql_url, csv_url='https://s3.amazonaws.com/opendoor-problems/li
     db.commit()
 
     print "CSV data loaded."
-    db.close()

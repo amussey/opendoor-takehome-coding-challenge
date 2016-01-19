@@ -7,7 +7,10 @@ from api.listings import Listings
 
 
 def create_app():
-    preprocess(mysql_url=os.environ['CLEARDB_DATABASE_URL'])
+    db = connect_to_mysql(mysql_url=os.environ['CLEARDB_DATABASE_URL'])
+    preprocess(db=db)
+    db.close()
+
     app = Flask(__name__)
 
     return app
@@ -29,7 +32,10 @@ def listings():
     response = Response(listings.to_json())
     response.headers['Links'] = listings.pagination_header()
 
+    db.close()
+
     return response
+
 
 if __name__ == '__main__':
     app.run()
