@@ -1,4 +1,4 @@
-# Opendoor Engineering Problem Solution
+# Opendoor Take-Home Coding Challenge
 
 This API was written as a part of the [Opendoor](http://opendoor.com) interview process.  A full problem description can be found in [PROBLEM.md](PROBLEM.md)
 
