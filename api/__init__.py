@@ -1,9 +1,9 @@
 from flask import Flask, request, Response
 import os
-import json
 
 from api.preprocess import preprocess
-from api.helpers import return_md_as_html, fetch_listings, connect_to_mysql, property_to_json
+from api.helpers import return_md_as_html, connect_to_mysql
+from api.listings import Listings
 
 
 def create_app():
@@ -23,16 +23,12 @@ def index():
 @app.route('/listings')
 def listings():
     db = connect_to_mysql(mysql_url=os.environ['CLEARDB_DATABASE_URL'])
-    listings, pagination = fetch_listings(db=db, request=request)
-    db.close()
 
-    results = {
-        "type": "FeatureCollection",
-        "features": [property_to_json(listing) for listing in listings]
-    }
+    listings = Listings(db=db, request=request)
 
-    response = Response(json.dumps(results))
-    response.headers['Links'] = pagination
+    response = Response(listings.to_json())
+    response.headers['Links'] = listings.pagination_header()
+
     return response
 
 if __name__ == '__main__':
