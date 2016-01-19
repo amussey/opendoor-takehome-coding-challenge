@@ -22,7 +22,7 @@ lint: pylint
 .PHONY: pylint
 pylint:  ## Lint the Python files.
 pylint: virtualenv
-	@source $(PYTHON_ENV)/bin/activate ; flake8 -v *.py
+	@source $(PYTHON_ENV)/bin/activate ; flake8 -v *.py api/
 
 .PHONY: help
 help:  ## This help dialog.
