@@ -2,8 +2,8 @@ from flask import Flask, request, Response
 import os
 import json
 
-from preprocess import preprocess
-from helpers import return_md_as_html, fetch_listings, connect_to_mysql, property_to_json
+from api.preprocess import preprocess
+from api.helpers import return_md_as_html, fetch_listings, connect_to_mysql, property_to_json
 
 
 def create_app():
