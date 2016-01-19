@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, jsonify
 import os
 
 from api.preprocess import preprocess
@@ -29,7 +29,7 @@ def listings():
 
     listings = Listings(db=db, request=request)
 
-    response = Response(listings.to_json())
+    response = jsonify(listings.to_dict())
     response.headers['Links'] = listings.pagination_header()
 
     db.close()

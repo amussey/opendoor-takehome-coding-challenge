@@ -1,9 +1,9 @@
 {
     "name": "Opendoor Engineering Problem Solution",
-    "description": "A demo API designed for Opendoor's take-home coding assignment for software engineers.",
-    "website": "https://github.com/amussey/opendoor-takehome-coding-api",
-    "repository": "https://github.com/amussey/opendoor-takehome-coding-api",
-    "logo": "https://raw.githubusercontent.com/amussey/opendoor-takehome-coding-api/master/static/images/app-logo.png",
+    "description": "A demo API designed as part of Opendoor's take-home coding assignment for software engineers.",
+    "website": "https://github.com/amussey/opendoor-takehome-coding-challenge",
+    "repository": "https://github.com/amussey/opendoor-takehome-coding-challenge",
+    "logo": "https://raw.githubusercontent.com/amussey/opendoor-takehome-coding-challenge/master/static/images/app-logo.png",
     "success_url": "/",
     "keywords": [
         "opendoor",

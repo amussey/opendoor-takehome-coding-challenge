@@ -1,5 +1,3 @@
-import json
-
 
 class Listings:
     LISTINGS_PER_PAGE = 15
@@ -34,13 +32,13 @@ class Listings:
 
         return ', '.join(links)
 
-    def to_json(self):
+    def to_dict(self):
         results = {
             "type": "FeatureCollection",
             "features": [self._property_to_json(listing) for listing in self.listings]
         }
 
-        return json.dumps(results)
+        return results
 
     def _count_listings(self):
         cursor = self.db.cursor()
