@@ -33,7 +33,7 @@ The `/listings` endpoint supports the following query parameters:
 
 ## Running
 
-The easiest way to run the app is to simply deploy it to Heroku.  View the *Deploying* section for an easy, one click button to do this.
+The easiest way to run the app is to simply deploy it to Heroku.  [View the *Deploying* section](#deploying) for an easy, one click button to do this.
 
 To run the app locally, start by creating a `.env` file containing a `CLEARDB_DATABASE_URL` and your credentials:
 
@@ -68,6 +68,8 @@ make lint
 
 [![One Click Heroku Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/amussey/opendoor-takehome-coding-challenge)
 
+This project is designed to be run on Heroku with a ClearDB MySQL backend (the free *Ignite* tier provides enough storage for the Opendoor CSV file).  Information on manually deploying to Heroku can be found [here](https://devcenter.heroku.com/articles/getting-started-with-python#deploy-the-app).
+
 ## Requirements Breakdown
 
 At a minimum:
@@ -76,7 +78,7 @@ At a minimum:
      + The output of this app has been linted against [GeoJSONlint.com](http://geojsonlint.com).
  - [X] Your API should correctly filter any combination of API parameters.
  - [X] Use a datastore.
-     + This projected is backed my MySQL.  The Heroku deploy script creates a ClearDB MySQL instance for storing and manipulating the data.
+     + This projected is backed my MySQL.  The Heroku deploy button creates a ClearDB MySQL instance for storing and manipulating the data.
 
 Bonus Points:
  - [X] Pagination via web linking (http://tools.ietf.org/html/rfc5988).
@@ -88,3 +90,5 @@ Given more time, I would like to make the following improvements:
 
  * Tests (primarily unit and acceptance).
  * Currently, every query against `/listings` creates a new MySQL connection.  Ideally, one connection could be created when the app launches and be refreshed when a disconnect is detected.
+ * Page sizes are currently static (locked to 15).  There should be a `count` parameter to make this configurable.
+ * Better exception handling.  There area a couple places where exception handling could be improved, such as around the database connection and around the handling of the CSV data.
